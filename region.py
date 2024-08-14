@@ -14,7 +14,7 @@ def mouse_callback(event, x, y, flags, param):
         points.append((x, y))
         print(f"Point selected: {(x, y)}")
 
-def vid_roi(video, save_file_prefix='roi'):
+def vid_roi(video, save_file='rois.txt'):
     global points, rois, roi_counter
     
     # Open video capture
@@ -45,11 +45,11 @@ def vid_roi(video, save_file_prefix='roi'):
             print(f"Rectangle coordinates: {points}")
 
         # Draw all saved ROIs
-        for idx, roi in enumerate(rois):
-            roi_array = np.array(roi, dtype=np.int32)
+        for roi in rois:
+            roi_array = np.array(roi['coordinates'], dtype=np.int32)
             roi_array = roi_array.reshape((-1, 1, 2))
             cv2.polylines(frame, [roi_array], isClosed=True, color=(255, 0, 0), thickness=2)
-            cv2.putText(frame, f'ROI {idx+1}', tuple(roi[0]), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+            cv2.putText(frame, roi['name'], tuple(roi['coordinates'][0]), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
         cv2.imshow('Frame', frame)
 
@@ -61,12 +61,17 @@ def vid_roi(video, save_file_prefix='roi'):
             points = []  # Reset points
             print("Points reset.")
         elif key == ord('s') and len(points) == 4:
-            # Save the current ROI
-            rois.append(points.copy())
-            save_file = f'{save_file_prefix}_{roi_counter}.txt'
-            with open(save_file, 'w') as f:
-                f.write(str(points))
-            print(f"ROI {roi_counter} saved to {save_file}")
+            # Prompt the user to enter a name for the ROI
+            roi_name = input(f"Enter a name for ROI {roi_counter}: ")
+            
+            # Save the current ROI with its name
+            rois.append({'name': roi_name, 'coordinates': points.copy()})
+            
+            # Save the ROI to the text file
+            with open(save_file, 'a') as f:
+                f.write(f"ROI {roi_counter}: {roi_name} - {points}\n")
+            
+            print(f"ROI {roi_counter} saved as '{roi_name}' to {save_file}")
             roi_counter += 1
             points = []  # Reset points for the next ROI
 
