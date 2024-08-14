@@ -34,7 +34,7 @@ import cv2
 from roi_selection import vid_roi
 ```
 vid_roi('path_to_your_video.mp4')
-```
+
 ## How to Use
 Select Points: Click on the video to select points for the ROI. You need to select four points to form a rectangular ROI.
 Press 's': After selecting the ROI, press 's' to save it. You will be prompted to enter a name for the ROI.
